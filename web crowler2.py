@@ -6,8 +6,10 @@ import requests
 start_url = "https://en.wikipedia.org/wiki/Special:Random"
 target_url = "https://en.wikipedia.org/wiki/Philosophy"
 
+
 def find_first_link(url):
-    #get the HTML of the url, using requests framework and inserting the HTML at Beautiful Soup
+    # get the HTML of the url, using requests framework and
+    # inserting the HTML at Beautiful Soup
     response = requests.get(url)
     html = response.text
     soup = bs4.BeautifulSoup(html, 'html.parser')
@@ -26,6 +28,7 @@ def find_first_link(url):
     first_link = urllib.parse.urljoin('https://en.wikipedia.org/', article_link)
 
     return first_link
+
 
 def continue_crawl(search_history, target_url, max_steps=30):
     if search_history[-1] == target_url:
