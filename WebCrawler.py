@@ -128,5 +128,11 @@ def main():
         time.sleep(2)
     print("This chain contains %s links!" % len(web_crawler.article_chain))
 
+    # save article chain
+    filename = "{0}-{1}.txt".format(web_crawler.start_url.split('/')[-1], web_crawler.target_url.split('/')[-1])
+    print("Saving article chain to {}.".format(filename))
+    with open(filename, 'w') as f:
+        f.write('\n'.join(url for url in web_crawler.article_chain))
+
 if __name__ == "__main__":
     main()
