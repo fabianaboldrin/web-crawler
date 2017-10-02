@@ -4,9 +4,7 @@ import time
 import bs4
 import urllib
 import requests
-
-start_url = "https://en.wikipedia.org/wiki/Special:Random"
-target_url = "https://en.wikipedia.org/wiki/Philosophy"
+import argparse
 
 
 def find_first_link(url):
@@ -27,9 +25,7 @@ def find_first_link(url):
     if not article_link:
         return
 
-    first_link = urllib.parse.urljoin('https://en.wikipedia.org/', article_link)
-
-    return first_link
+    return urllib.parse.urljoin('https://en.wikipedia.org/', article_link)
 
 
 def continue_crawl(search_history, target_url, max_steps=30):
@@ -42,20 +38,50 @@ def continue_crawl(search_history, target_url, max_steps=30):
     elif search_history[-1] in search_history[:-1]:
         print("We've arrived at an article we've already seen; aborting search!")
         return False
-    else:
-        return True
+    return True
 
-article_chain = [start_url]
 
-while continue_crawl(article_chain, target_url):
-    print(article_chain[-1])
-    # download html of last article in article_chain
-    # find the first link in that html
-    first_link = find_first_link(article_chain[-1])
-    if not first_link:
-        print("We've arrived at an article with no links, aborting search!.")
-        break
-    # add the first link to article chain
-    article_chain.append(first_link)
-    # delay for about two seconds
-    time.sleep(2)
+def get_arg_parser():
+    """
+    Sets up the argument parser
+    """
+    parser = argparse.ArgumentParser(
+        description="Wikipedia Web Crawler",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        '-s', help='Start URL (e.g. https://en.wikipedia.org/wiki/Special:Random)', dest='start_url')
+    parser.add_argument(
+        '-t', help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy', dest='target_url')
+    return parser
+
+
+def process_arguments():
+    """
+    Process the arguments
+    """
+    arg_parser = get_arg_parser()
+    arguments = arg_parser.parse_args()
+
+    if arguments.start_url is None:
+        arg_parser.error('Start URL (-s) is required')
+    if arguments.target_url is None:
+        arg_parser.error('Target URL (-t) is required')
+    return arguments
+
+if __name__ == '__main__':
+    args = process_arguments()
+    article_chain = [args.start_url]
+
+    while continue_crawl(article_chain, args.target_url):
+        print(article_chain[-1])
+        # download html of last article in article_chain
+        # find the first link in that html
+        first_link = find_first_link(article_chain[-1])
+        if not first_link:
+            print("We've arrived at an article with no links, aborting search!.")
+            break
+        # add the first link to article chain
+        article_chain.append(first_link)
+        # delay for about two seconds
+        time.sleep(2)
