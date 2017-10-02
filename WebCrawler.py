@@ -7,8 +7,10 @@ import bs4
 import requests
 
 
-class WebCrowler:
-    """Class to find first article in Wikipedia in chain until it finds a target url"""
+class WebCrawler:
+    """
+    Class to find first article in Wikipedia in chain until it finds a target url
+    """
 
     def __init__(self,
                  start_url=None,
@@ -24,15 +26,19 @@ class WebCrowler:
         self.article_chain = [start_url]
 
     def last_article_in_chain(self):
-        """This function will return the last article in the article_chain list"""
+        """
+        This function will return the last article in the article_chain list
+        """
         return self.article_chain[-1]
 
     def find_first_link(self):
-        """Get the HTML of the url, using requests framework and
-           inserting the HTML at Beautiful Soup"""
+        """
+        Get the HTML of the url, using requests framework and
+        inserting the HTML at Beautiful Soup
+        """
         response = requests.get(self.last_article_in_chain())
         html = response.text
-        soup = bs4.BeautifulSoup(html, 'html.parser')
+        soup = bs4.BeautifulSoup(html, 'html5lib')
 
         # The div with the main of the article
         content_div = soup.find(class_="mw-parser-output")
@@ -51,7 +57,9 @@ class WebCrowler:
         return first_link
 
     def continue_crawl(self, max_steps=30):
-        """This function will return True if it can continue finding articles"""
+        """
+        This function will return True if it can continue finding articles
+        """
         if self.last_article_in_chain() == self.target_url:
             print("We've found the target article!")
             return False
@@ -80,8 +88,13 @@ def get_arg_parser():
     )
     parser.add_argument(
         '-t', 
-        help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy', 
+        help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy)', 
         dest='target_url'
+    )
+    parser.add_argument(
+        '-m', 
+        help='Maximum steps in chain, default: 30', 
+        dest='max_steps'
     )
     return parser
 
@@ -99,20 +112,27 @@ def process_arguments():
 def main():
     """This is the main function which will run if this is the main script"""
     args = process_arguments()
-    web_crowler = WebCrowler(start_url=args.start_url, target_url=args.target_url)
-    print('Start url: %s' % web_crowler.start_url)
-    print('Target url: %s' % web_crowler.target_url)
-    while web_crowler.continue_crawl():
-        print(web_crowler.last_article_in_chain())
+    web_crawler = WebCrawler(start_url=args.start_url, target_url=args.target_url)
+    print('Start url: %s' % web_crawler.start_url)
+    print('Target url: %s' % web_crawler.target_url)
+
+    while web_crawler.continue_crawl(int(args.max_steps)):
+        print(web_crawler.last_article_in_chain())
         # download html of last article in article_chain
         # find the first link in that html
-        first_link = web_crowler.find_first_link()
+        first_link = web_crawler.find_first_link()
         if not first_link:
             print("We've arrived at an article with no links, aborting search!.")
             break
         # delay for about two seconds
         time.sleep(2)
-    print("This chain contains %s links!" % len(web_crowler.article_chain))
+    print("This chain contains %s links!" % len(web_crawler.article_chain))
+
+    # save article chain
+    filename = "{0}-{1}.txt".format(web_crawler.start_url.split('/')[-1], web_crawler.target_url.split('/')[-1])
+    print("Saving article chain to {}.".format(filename))
+    with open(filename, 'w') as f:
+        f.write('\n'.join(url for url in web_crawler.article_chain))
 
 if __name__ == "__main__":
     main()
