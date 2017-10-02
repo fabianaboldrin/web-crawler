@@ -8,7 +8,9 @@ import requests
 
 
 class WebCrawler:
-    """Class to find first article in Wikipedia in chain until it finds a target url"""
+    """
+    Class to find first article in Wikipedia in chain until it finds a target url
+    """
 
     def __init__(self,
                  start_url=None,
@@ -24,12 +26,16 @@ class WebCrawler:
         self.article_chain = [start_url]
 
     def last_article_in_chain(self):
-        """This function will return the last article in the article_chain list"""
+        """
+        This function will return the last article in the article_chain list
+        """
         return self.article_chain[-1]
 
     def find_first_link(self):
-        """Get the HTML of the url, using requests framework and
-           inserting the HTML at Beautiful Soup"""
+        """
+        Get the HTML of the url, using requests framework and
+        inserting the HTML at Beautiful Soup
+        """
         response = requests.get(self.last_article_in_chain())
         html = response.text
         soup = bs4.BeautifulSoup(html, 'html5lib')
@@ -51,7 +57,9 @@ class WebCrawler:
         return first_link
 
     def continue_crawl(self, max_steps=30):
-        """This function will return True if it can continue finding articles"""
+        """
+        This function will return True if it can continue finding articles
+        """
         if self.last_article_in_chain() == self.target_url:
             print("We've found the target article!")
             return False
@@ -80,8 +88,13 @@ def get_arg_parser():
     )
     parser.add_argument(
         '-t', 
-        help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy', 
+        help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy)', 
         dest='target_url'
+    )
+    parser.add_argument(
+        '-m', 
+        help='Maximum steps in chain, default: 30', 
+        dest='max_steps'
     )
     return parser
 
@@ -102,7 +115,8 @@ def main():
     web_crawler = WebCrawler(start_url=args.start_url, target_url=args.target_url)
     print('Start url: %s' % web_crawler.start_url)
     print('Target url: %s' % web_crawler.target_url)
-    while web_crawler.continue_crawl():
+
+    while web_crawler.continue_crawl(int(args.max_steps)):
         print(web_crawler.last_article_in_chain())
         # download html of last article in article_chain
         # find the first link in that html
