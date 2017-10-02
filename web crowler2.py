@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import time
 import urllib
 import bs4
@@ -10,8 +11,14 @@ class WebCrowler:
     """Class to find first article in Wikipedia in chain until it finds a target url"""
 
     def __init__(self,
-                 start_url="https://en.wikipedia.org/wiki/Special:Random",
-                 target_url="https://en.wikipedia.org/wiki/Philosophy"):
+                 start_url=None,
+                 target_url=None):
+        if start_url is None:
+            start_url = "https://en.wikipedia.org/wiki/Special:Random"
+            print("Using default start url")
+        if target_url is None:
+            target_url = "https://en.wikipedia.org/wiki/Philosophy"
+            print("Using default target url")
         self.start_url = start_url
         self.target_url = target_url
         self.article_chain = [start_url]
@@ -58,9 +65,43 @@ class WebCrowler:
             return True
 
 
+def get_arg_parser():
+    """
+    Sets up the argument parser
+    """
+    parser = argparse.ArgumentParser(
+        description="Wikipedia Web Crawler",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        '-s', 
+        help='Start URL (e.g. https://en.wikipedia.org/wiki/Special:Random)', 
+        dest='start_url'
+    )
+    parser.add_argument(
+        '-t', 
+        help='Target URL (e.g. https://en.wikipedia.org/wiki/Philosophy', 
+        dest='target_url'
+    )
+    return parser
+
+
+def process_arguments():
+    """
+    Process the arguments
+    """
+    arg_parser = get_arg_parser()
+    arguments = arg_parser.parse_args()
+
+    return arguments
+
+
 def main():
     """This is the main function which will run if this is the main script"""
-    web_crowler = WebCrowler()
+    args = process_arguments()
+    web_crowler = WebCrowler(start_url=args.start_url, target_url=args.target_url)
+    print('Start url: %s' % web_crowler.start_url)
+    print('Target url: %s' % web_crowler.target_url)
     while web_crowler.continue_crawl():
         print(web_crowler.last_article_in_chain())
         # download html of last article in article_chain
@@ -72,7 +113,6 @@ def main():
         # delay for about two seconds
         time.sleep(2)
     print("This chain contains %s links!" % len(web_crowler.article_chain))
-
 
 if __name__ == "__main__":
     main()
