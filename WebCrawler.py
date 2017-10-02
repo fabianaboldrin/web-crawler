@@ -5,7 +5,10 @@ import time
 import urllib
 import bs4
 import requests
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class WebCrawler:
     """
@@ -17,10 +20,10 @@ class WebCrawler:
                  target_url=None):
         if start_url is None:
             start_url = "https://en.wikipedia.org/wiki/Special:Random"
-            print("Using default start url")
+            logger.info("Using default start url")
         if target_url is None:
             target_url = "https://en.wikipedia.org/wiki/Philosophy"
-            print("Using default target url")
+            logger.info("Using default target url")
         self.start_url = start_url
         self.target_url = target_url
         self.article_chain = [start_url]
@@ -61,13 +64,13 @@ class WebCrawler:
         This function will return True if it can continue finding articles
         """
         if self.last_article_in_chain() == self.target_url:
-            print("We've found the target article!")
+            logger.info("We've found the target article!")
             return False
         elif len(self.article_chain) > max_steps:
-            print("The search has gone on suspiciously long; aborting search!")
+            logger.info("The search has gone on suspiciously long; aborting search!")
             return False
         elif self.last_article_in_chain() in self.article_chain[:-1]:
-            print("We've arrived at an article we've already seen; aborting search!")
+            logger.info("We've arrived at an article we've already seen; aborting search!")
             return False
         else:
             return True
@@ -113,24 +116,24 @@ def main():
     """This is the main function which will run if this is the main script"""
     args = process_arguments()
     web_crawler = WebCrawler(start_url=args.start_url, target_url=args.target_url)
-    print('Start url: %s' % web_crawler.start_url)
-    print('Target url: %s' % web_crawler.target_url)
+    logger.info('Start url: {}'.format(web_crawler.start_url))
+    logger.info('Target url: {}'.format(web_crawler.target_url))
 
     while web_crawler.continue_crawl(int(args.max_steps)):
-        print(web_crawler.last_article_in_chain())
+        logger.info(web_crawler.last_article_in_chain())
         # download html of last article in article_chain
         # find the first link in that html
         first_link = web_crawler.find_first_link()
         if not first_link:
-            print("We've arrived at an article with no links, aborting search!.")
+            logger.info("We've arrived at an article with no links, aborting search!.")
             break
         # delay for about two seconds
         time.sleep(2)
-    print("This chain contains %s links!" % len(web_crawler.article_chain))
+    logger.info("This chain contains {} links!".format(len(web_crawler.article_chain)))
 
     # save article chain
     filename = "{0}-{1}.txt".format(web_crawler.start_url.split('/')[-1], web_crawler.target_url.split('/')[-1])
-    print("Saving article chain to {}.".format(filename))
+    logger.info("Saving article chain to {}.".format(filename))
     with open(filename, 'w') as f:
         f.write('\n'.join(url for url in web_crawler.article_chain))
 
