@@ -32,7 +32,7 @@ class WebCrawler:
            inserting the HTML at Beautiful Soup"""
         response = requests.get(self.last_article_in_chain())
         html = response.text
-        soup = bs4.BeautifulSoup(html, 'html.parser')
+        soup = bs4.BeautifulSoup(html, 'html5lib')
 
         # The div with the main of the article
         content_div = soup.find(class_="mw-parser-output")
