@@ -7,7 +7,7 @@ import bs4
 import requests
 
 
-class WebCrowler:
+class WebCrawler:
     """Class to find first article in Wikipedia in chain until it finds a target url"""
 
     def __init__(self,
@@ -99,20 +99,20 @@ def process_arguments():
 def main():
     """This is the main function which will run if this is the main script"""
     args = process_arguments()
-    web_crowler = WebCrowler(start_url=args.start_url, target_url=args.target_url)
-    print('Start url: %s' % web_crowler.start_url)
-    print('Target url: %s' % web_crowler.target_url)
-    while web_crowler.continue_crawl():
-        print(web_crowler.last_article_in_chain())
+    web_crawler = WebCrawler(start_url=args.start_url, target_url=args.target_url)
+    print('Start url: %s' % web_crawler.start_url)
+    print('Target url: %s' % web_crawler.target_url)
+    while web_crawler.continue_crawl():
+        print(web_crawler.last_article_in_chain())
         # download html of last article in article_chain
         # find the first link in that html
-        first_link = web_crowler.find_first_link()
+        first_link = web_crawler.find_first_link()
         if not first_link:
             print("We've arrived at an article with no links, aborting search!.")
             break
         # delay for about two seconds
         time.sleep(2)
-    print("This chain contains %s links!" % len(web_crowler.article_chain))
+    print("This chain contains %s links!" % len(web_crawler.article_chain))
 
 if __name__ == "__main__":
     main()
