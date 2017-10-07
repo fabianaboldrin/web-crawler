@@ -1,15 +1,16 @@
 language: python
 
 python:
-  - "3.4"
-  - "3.5"
-  - "3.3"
+  - "2.7"
 
 branches:
   only:
     - master
+    - progress
 
 install: "pip install -r requirements.txt"
+
+script: echo foo
 
 before_script: echo 'Hello'
 after_script: echo 'Bye'
