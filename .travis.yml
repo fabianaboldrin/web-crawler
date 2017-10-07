@@ -1,0 +1,23 @@
+language: python
+
+python:
+  - "3.4"
+  - "3.5"
+  - "3.3"
+
+branches:
+  only:
+    - master
+
+install: "pip install -r requirements.txt"
+
+before_script: echo 'Hello'
+after_script: echo 'Bye'
+
+notifications:
+  email:
+    recipients:
+      - bibacb.fb@gmail.com
+      
+    on_success: [always]
+    on_failure: [always]
