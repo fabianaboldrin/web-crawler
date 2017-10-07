@@ -99,6 +99,12 @@ def get_arg_parser():
         help='Maximum steps in chain, default: 30', 
         dest='max_steps'
     )
+    parser.add_argument(
+        '-d',
+        help='Delay between links in seconds, default: 2',
+        default=2.0,
+        dest='delay'
+    )
     return parser
 
 
@@ -127,8 +133,9 @@ def main():
         if not first_link:
             logger.info("We've arrived at an article with no links, aborting search!.")
             break
-        # delay for about two seconds
-        time.sleep(2)
+        # delay between page crawls
+        logger.info("Waiting {0} seconds before next next retrieval".format(args.delay))
+        time.sleep(float(args.delay))
     logger.info("This chain contains {} links!".format(len(web_crawler.article_chain)))
 
     # save article chain
