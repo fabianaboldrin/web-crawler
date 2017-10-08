@@ -3,7 +3,7 @@
 
 Program designed to be used in Wikipedia sites only. It searches for the first link in the page and stop when it gets to a specific page (ex. philosophy)
 
-# Instalation
+# Installation
   Currently working in Python 3.x
   
   *Clone the git*
